@@ -193,11 +193,6 @@ export default class CZScrollTab extends Component{
 }
 
 const styles = StyleSheet.create({
-    MainView: {
-        flex: 1,
-        backgroundColor: '#FFFFFF'
-    },
-
     RadiusPointView: {
         position: 'absolute',
         right: -6,
