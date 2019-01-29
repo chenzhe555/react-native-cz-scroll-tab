@@ -1,0 +1,19 @@
+
+{
+  "name": "react-native-cz-scroll-tab",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "scroll",
+    "tab",
+    "menu",
+    "scroll-tab"
+  ],
+  "author": "376811578@qq.com",
+  "license": "MIT"
+}
