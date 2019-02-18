@@ -21,24 +21,7 @@ import ScrollTab from 'react-native-cz-scroll-tab';
 />
 ```
 
-###  2.方法说明:
-```
-/*
-* 赋值当前视图
-* */
-evaluateView
-```
-
-```
-/*
-* 点击某个Item事件
-* item：当前选中对象
-* index：对应索引值
-* */
-selectItemAtIndex(item, index)
-```
-
-###  3.属性说明:
+###  2.属性:
 ```
 type: 1.默认类型，目前只支持1
 ```
@@ -66,3 +49,22 @@ normalTextStyles: 未选中时样式：{fontSize: 15, color: 'red'}
 ```
 selectedTextStyles: 选中时样式：{fontSize: 18, color: 'red'}
 ```
+
+###  3.属性方法:
+```
+/*
+* 赋值当前视图
+* */
+evaluateView
+```
+
+```
+/*
+* 点击某个Item事件
+* item：当前选中对象
+* index：对应索引值
+* */
+selectItemAtIndex(item, index)
+```
+
+###  4.供外部调用的方法:
