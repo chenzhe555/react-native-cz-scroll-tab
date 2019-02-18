@@ -2,11 +2,21 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 
 /*
- type: 1.默认类型   #显示类型
- list: [{'name': 'Tab名', 'redCount': 12}]   #初始数据源
- normalTextStyles: {fontSize: 15, color: 'red'}   #未选中样式
- selectedTextStyles: {fontSize: 18, color: 'red'}   #选中样式
- lineColor: '#FF0000'   #type=1的底部横线颜色
+ props:
+ type: 1.默认类型，目前只支持1
+ viewWidth:
+ isScroll: 是否可滚动；如果滚动，则根据文本排列，如果不滚动，则根据屏幕平分。默认不可滚动
+ style: 主视图样式：{'height': 50}；高度必须要有
+ list: 列表数据源: {'name': 'Tab1', 'redCount': '3'} name: 显示名称 redCount: 红点数量
+ currentIndex: 当前选中索引值，默认第一个
+ clickSame: 如果点击一样的Tab，是否也触发selectItemAtIndex方法。默认不触发
+ lineColor: 当type=1的时候，底部横线的颜色
+
+ func:
+ evaluateView: 赋值当前视图对象
+ selectItemAtIndex(item, index): 点击某个Item事件，item：当前对象；index：对应索引值
+ normalTextStyles: 未选中时样式：{fontSize: 15, color: 'red'}  
+ selectedTextStyles: 选中时样式：{fontSize: 18, color: 'red'}  
  */
 export default class CZScrollTab extends Component{
     
@@ -29,20 +39,18 @@ export default class CZScrollTab extends Component{
     * */
     initializeParams() {
         this.state = {
+            //是否可滚动，默认不可滚动
+            isScroll: this.props.isScroll ? true : false,
             //额外样式
             style: this.props.style ? this.props.style : {},
             //显示数据源
             list: this.props.list ? this.props.list : [],
             //当前选中Item
             currentIndex: this.props.currentIndex ? this.props.currentIndex : 0,
-            //是否可滚动，默认不可滚动
-            isScroll: this.props.isScroll ? true : false,
             //点击同样的是否触发事件，默认不触发
             clickSame: this.props.clickSame ? true : false,
             //底部横线的颜色
-            lineColor: this.props.lineColor ? this.props.lineColor : '#FF0000',
-            //CZScrollTab宽度
-            viewWidth: this.props.width ? this.props.width : Dimensions.get('window').width
+            lineColor: this.props.lineColor ? this.props.lineColor : '#FF0000'
         };
     }
 
@@ -85,8 +93,10 @@ export default class CZScrollTab extends Component{
 
     /************************** List相关方法 **************************/
     _renderItem(item) {
-        const { isScroll, lineColor, currentIndex, viewWidth, list } = this.state;
+        const { isScroll, lineColor, currentIndex, list } = this.state;
+        if (!this.viewWidth && !isScroll) return null;
         const { normalTextStyles, selectedTextStyles } = this.props;
+        const { viewWidth } = this;
 
         //文本视图
         let textView = null;
@@ -170,13 +180,26 @@ export default class CZScrollTab extends Component{
         );
     }
     /************************** Render中方法 **************************/
+    /*
+    * 获取视图尺寸
+    * */
+    _onLayout = (event) => {
+        const{ isScroll } = this.state;
+        this.viewWidth = event.nativeEvent.layout.width;
+        //由于获取到视图宽度的时候，已经render了，如果isScroll是fasle的话，第一次渲染的时候不能获取到宽度，所以这里重新render一次
+        if (!isScroll) {
+            this.setState({
+                isScroll: false
+            });
+        }
+    }
 
 
     render() {
         const { list, isScroll, style } = this.state;
 
         return (
-            <View style={[styles.MainView, style]}>
+            <View style={[style]} onLayout={this._onLayout}>
                 <FlatList
                     ref={(flatlist) => this.flatlist = flatlist}
                     data={list}
