@@ -121,6 +121,7 @@ export default class CZScrollTab extends Component{
         let redCountText = redCount > 99 ? '99+' : redCount;
 
         //选中Item
+        //TODO: 后期红点使用react-native-cz-reddot
         if (item.index == currentIndex) {
             //文本样式
             let textStyles = [{
