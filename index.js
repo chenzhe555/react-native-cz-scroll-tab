@@ -2,22 +2,26 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
 
 /*
- props:
- type: 1.默认类型，目前只支持1
- viewWidth:
- isScroll: 是否可滚动；如果滚动，则根据文本排列，如果不滚动，则根据屏幕平分。默认不可滚动
- style: 主视图样式：{'height': 50}；高度必须要有
- list: 列表数据源: {'name': 'Tab1', 'redCount': '3'} name: 显示名称 redCount: 红点数量
- currentIndex: 当前选中索引值，默认第一个
- clickSame: 如果点击一样的Tab，是否也触发selectItemAtIndex方法。默认不触发
- lineColor: 当type=1的时候，底部横线的颜色
-
- func:
- evaluateView: 赋值当前视图对象
- selectItemAtIndex(item, index): 点击某个Item事件，item：当前对象；index：对应索引值
- normalTextStyles: 未选中时样式：{fontSize: 15, color: 'red'}  
- selectedTextStyles: 选中时样式：{fontSize: 18, color: 'red'}  
- */
+* props:
+* type: 1.默认类型，目前只支持1
+* viewWidth:
+* isScroll: 是否可滚动；如果滚动，则根据文本排列，如果不滚动，则根据屏幕平分。默认不可滚动
+* style: 主视图样式：{'height': 50}；高度必须要有
+* list: 列表数据源: {'name': 'Tab1', 'redCount': '3'} name: 显示名称 redCount: 红点数量
+* currentIndex: 当前选中索引值，默认第一个
+* clickSame: 如果点击一样的Tab，是否也触发selectItemAtIndex方法。默认不触发
+* lineColor: 当type=1的时候，底部横线的颜色
+*
+* func:
+* evaluateView: 赋值当前视图对象
+* selectItemAtIndex(item, index): 点击某个Item事件，item：当前对象；index：对应索引值
+* normalTextStyles: 未选中时样式：{fontSize: 15, color: 'red'}
+* selectedTextStyles: 选中时样式：{fontSize: 18, color: 'red'}
+*
+* export func:
+* modifyList(list): 直接修改数据源
+* modifyIndex(index): 切换到指定索引值
+* */
 export default class CZScrollTab extends Component{
     
     /************************** 生命周期 **************************/
@@ -54,7 +58,9 @@ export default class CZScrollTab extends Component{
         };
     }
 
-    //点击Cell触发事件
+    /*
+    * 点击Cell触发事件
+    * */
     clickItemAtIndex(index) {
         const { clickSame, currentIndex, list } = this.state;
 
@@ -66,21 +72,27 @@ export default class CZScrollTab extends Component{
         }
     }
 
-    //点击某个Item事件
+    /*
+    * 点击某个Item事件
+    * */
     callFuncAtIndex(index) {
         const { list } = this.state;
         if (this.props.selectItemAtIndex) this.props.selectItemAtIndex(list[index], index);
     }
 
     /************************** 外部调用方法 **************************/
-    //直接修改数据源
+    /*
+    * 直接修改数据源
+    * */
     modifyList(list) {
         this.setState({
             list: list
         });
     }
 
-    //切换到指定索引值
+    /*
+    * 切换到指定索引值(跳转效果细节后续优化)
+    * */
     modifyIndex(index) {
         const { isScroll } = this.state;
         this.setState({

@@ -68,3 +68,9 @@ selectItemAtIndex(item, index)
 ```
 
 ###  4.供外部调用的方法:
+```
+modifyList(list): 直接修改数据源
+```
+```
+modifyIndex(index): 切换到指定索引值
+```
