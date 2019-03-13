@@ -110,27 +110,7 @@ export default class CZScrollTab extends Component{
         switch (this.state.type) {
             case -1:
             {
-                if (item.index == this.state.currentIndex) {
-                    if (this.props.renderCustomSelectedItemView) {
-                        return (
-                            <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
-                                {this.props.renderCustomSelectedItemView(item.item, item.index)}
-                            </TouchableWithoutFeedback>
-                        );
-                    } else {
-                        return null;
-                    }
-                } else {
-                    if (this.props.renderCustomUnSelectedItemView) {
-                        return (
-                            <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
-                                {this.props.renderCustomUnSelectedItemView(item.item, item.index)}
-                            </TouchableWithoutFeedback>
-                        );
-                    } else {
-                        return null;
-                    }
-                }
+                return this.renderMinus1Item(item);
             }
                 break;
             case 2:
@@ -143,6 +123,30 @@ export default class CZScrollTab extends Component{
                 return this.renderType1Item(item);
             }
              break;
+        }
+    }
+
+    renderMinus1Item = (item) => {
+        if (item.index == this.state.currentIndex) {
+            if (this.props.renderCustomSelectedItemView) {
+                return (
+                    <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
+                        {this.props.renderCustomSelectedItemView(item.item, item.index)}
+                    </TouchableWithoutFeedback>
+                );
+            } else {
+                return null;
+            }
+        } else {
+            if (this.props.renderCustomUnSelectedItemView) {
+                return (
+                    <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
+                        {this.props.renderCustomUnSelectedItemView(item.item, item.index)}
+                    </TouchableWithoutFeedback>
+                );
+            } else {
+                return null;
+            }
         }
     }
 

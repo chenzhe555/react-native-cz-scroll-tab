@@ -3,6 +3,7 @@
 
 npm install react-native-cz-scroll-tab --save
 
+[Demo代码地址](https://github.com/chenzhe555/react-native-cz-demo)
 	
 
 ## Usage
@@ -23,8 +24,16 @@ import ScrollTab from 'react-native-cz-scroll-tab';
 
 ###  2.属性:
 ```
-type: 1.默认类型
+type: 见下多图 type: 1,2,3
 ```
+![type=1](https://github.com/chenzhe555/react-native-cz-scroll-tab/blob/master/images/type1.png)
+type=1
+
+![type=2](https://github.com/chenzhe555/react-native-cz-scroll-tab/blob/master/images/type2.png)
+type=2
+
+![type=3](https://github.com/chenzhe555/react-native-cz-scroll-tab/blob/master/images/type3.png)
+type=3
 ```
 isScroll: 是否可滚动；如果滚动，则根据文本排列，如果不滚动，则根据屏幕平分。默认不可滚动
 ```
