@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, TouchableWithoutFeedback } from 'react-native';
 
 /*
 * props:
-* type: 1.默认类型，目前只支持1
-* viewWidth:
+* type: 1.默认类型
 * isScroll: 是否可滚动；如果滚动，则根据文本排列，如果不滚动，则根据屏幕平分。默认不可滚动
 * style: 主视图样式：{'height': 50}；高度必须要有
 * list: 列表数据源: {'name': 'Tab1', 'redCount': '3'} name: 显示名称 redCount: 红点数量
@@ -15,8 +14,12 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from '
 * func:
 * evaluateView: 赋值当前视图对象
 * selectItemAtIndex(item, index): 点击某个Item事件，item：当前对象；index：对应索引值
-* normalTextStyles: 未选中时样式：{fontSize: 15, color: 'red'}
-* selectedTextStyles: 选中时样式：{fontSize: 18, color: 'red'}
+* normalTextStyle: 未选中时样式：type:1 * {fontSize: 14, color: '#999999', fontFamily: 'PingFangSC-Regular'} * ; type:2 * {fontSize: 16, color: '#AAE039', fontFamily: 'PingFangSC-Semibold'} *
+* selectedTextStyle: 选中时样式：type:1 * {fontSize: 18, color: '#111111', fontFamily: 'PingFangSC-Semibold'} * ; type:2 * {fontSize: 16, color: '#FFFFFF', fontFamily: 'PingFangSC-Semibold'} *
+* normalBGStyle: 未选中背景样式 type:2 * {backgroundColor: '#FFFFFF'} *
+* selectedBGStyle: 选中背景样式 type:2 * {backgroundColor: '#AAE039'} *
+* renderCustomUnSelectedItemView(item, index): 自定义未选中样式
+* renderCustomSelectedItemView(item, index): 自定义选中样式
 *
 * export func:
 * modifyList(list): 直接修改数据源
@@ -41,27 +44,31 @@ export default class CZScrollTab extends Component{
     /*
     * 初始化参数
     * */
-    initializeParams() {
+    initializeParams = () => {
+        //整个组件宽度
+        this.viewWidth = 0;
         this.state = {
+            //当前ScrollTab样式
+            type: this.props.type ? this.props.type : 1,
             //是否可滚动，默认不可滚动
             isScroll: this.props.isScroll ? true : false,
-            //额外样式
+            //主视图样式
             style: this.props.style ? this.props.style : {},
-            //显示数据源
+            //数据源
             list: this.props.list ? this.props.list : [],
             //当前选中Item
             currentIndex: this.props.currentIndex ? this.props.currentIndex : 0,
             //点击同样的是否触发事件，默认不触发
             clickSame: this.props.clickSame ? true : false,
             //底部横线的颜色
-            lineColor: this.props.lineColor ? this.props.lineColor : '#FF0000'
+            lineColor: this.props.lineColor ? this.props.lineColor : '#AAE039'
         };
     }
 
     /*
     * 点击Cell触发事件
     * */
-    clickItemAtIndex(index) {
+    clickItemAtIndex = (index) => {
         const { clickSame, currentIndex, list } = this.state;
 
         if (clickSame || currentIndex != index) {
@@ -72,19 +79,11 @@ export default class CZScrollTab extends Component{
         }
     }
 
-    /*
-    * 点击某个Item事件
-    * */
-    callFuncAtIndex(index) {
-        const { list } = this.state;
-        if (this.props.selectItemAtIndex) this.props.selectItemAtIndex(list[index], index);
-    }
-
     /************************** 外部调用方法 **************************/
     /*
     * 直接修改数据源
     * */
-    modifyList(list) {
+    modifyList = (list) => {
         this.setState({
             list: list
         });
@@ -93,22 +92,72 @@ export default class CZScrollTab extends Component{
     /*
     * 切换到指定索引值(跳转效果细节后续优化)
     * */
-    modifyIndex(index) {
+    modifyIndex = (index) => {
         const { isScroll } = this.state;
         this.setState({
             currentIndex: index
         });
         //滚动到指定索引值并触发事件
         if (isScroll) this.flatlist.scrollToIndex({'index': index});
-        this.callFuncAtIndex(index);
+        if (this.props.selectItemAtIndex) this.props.selectItemAtIndex(this.state.list[index], index);
     }
 
     /************************** List相关方法 **************************/
-    _renderItem(item) {
+    _renderItem = (item) => {
+        //如果不能滚动且viewWidth还没值的时候直接返回null
+        if (!this.state.isScroll && !this.viewWidth) return null;
+
+        switch (this.state.type) {
+            case -1:
+            {
+                if (item.index == this.state.currentIndex) {
+                    if (this.props.renderCustomSelectedItemView) {
+                        return (
+                            <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
+                                {this.props.renderCustomSelectedItemView(item.item, item.index)}
+                            </TouchableWithoutFeedback>
+                        );
+                    } else {
+                        return null;
+                    }
+                } else {
+                    if (this.props.renderCustomUnSelectedItemView) {
+                        return (
+                            <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
+                                {this.props.renderCustomUnSelectedItemView(item.item, item.index)}
+                            </TouchableWithoutFeedback>
+                        );
+                    } else {
+                        return null;
+                    }
+                }
+            }
+                break;
+            case 2:
+            {
+                return this.renderType2Item(item);
+            }
+             break;
+            default:
+            {
+                return this.renderType1Item(item);
+            }
+             break;
+        }
+    }
+
+    /*
+    * type = 1时样式
+    * */
+    renderType1Item = (item) => {
         const { isScroll, lineColor, currentIndex, list } = this.state;
-        if (!this.viewWidth && !isScroll) return null;
-        const { normalTextStyles, selectedTextStyles } = this.props;
         const { viewWidth } = this;
+        const {
+            normalBGStyle = {backgroundColor: '#FFFFFF'},
+            selectedBGStyle = {backgroundColor: '#FFFFFF'},
+            normalTextStyle = {fontSize: 14, color: '#999999', fontFamily: 'PingFangSC-Regular'},
+            selectedTextStyle = {fontSize: 18, color: '#111111', fontFamily: 'PingFangSC-Semibold'}
+        } = this.props;
 
         //文本视图
         let textView = null;
@@ -120,22 +169,19 @@ export default class CZScrollTab extends Component{
         let redCount = parseInt(item.item['redCount'] ? item.item['redCount'] : 0);
         let redCountText = redCount > 99 ? '99+' : redCount;
 
+        let mainStyles = [{
+            flex: 1
+        }];
+
         //选中Item
         //TODO: 后期红点使用react-native-cz-reddot
         if (item.index == currentIndex) {
+            mainStyles.push(selectedBGStyle);
             //文本样式
-            let textStyles = [{
-                fontSize: 18,
-                color: '#111111',
-                fontFamily: 'PingFangSC-Semibold'
-            }];
+            let textStyles = [selectedTextStyle];
             if (isScroll) {
-                textStyles.push({
-                    marginLeft: 10,
-                    marginRight: 10
-                });
+                textStyles.push(styles.CommonSpace);
             };
-            if (selectedTextStyles) textStyles.push(selectedTextStyles);
 
             textView = (
                 <View>
@@ -150,13 +196,11 @@ export default class CZScrollTab extends Component{
                 </View>
             );
             lineView = (
-                <View style={[{ alignItems: 'center' }]}>
-                    <View style={[{width: (name.length * 20), height: 2, backgroundColor: lineColor}]}></View>
-                </View>
+                <View style={[{width: '100%', height: 2, backgroundColor: lineColor}]}></View>
             );
         } else {
-            let textStyles = [styles.UnSelectedTextView];
-            if (normalTextStyles) textStyles.push(normalTextStyles);
+            mainStyles.push(normalBGStyle);
+            let textStyles = [normalTextStyle, styles.CommonSpace];
             textView = (
                 <View>
                     <Text style={textStyles}>{name}</Text>
@@ -172,9 +216,6 @@ export default class CZScrollTab extends Component{
         }
 
         //如果不能滚动，则定宽
-        let mainStyles = [{
-            flex: 1
-        }];
         if (!isScroll) {
             mainStyles.push({
                 width: viewWidth/list.length
@@ -182,14 +223,61 @@ export default class CZScrollTab extends Component{
         }
 
         return (
-            <TouchableOpacity onPress={this.clickItemAtIndex.bind(this,item.index)}>
+            <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
                 <View style={mainStyles}>
                     <View style={[styles.RowCenter, { flex: 1 }]}>
                         {textView}
                     </View>
                     {lineView}
                 </View>
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
+        );
+    }
+
+    /*
+    * type = 2时样式
+    * */
+    renderType2Item = (item) => {
+        const {
+            normalBGStyle = {backgroundColor: '#FFFFFF'},
+            selectedBGStyle = {backgroundColor: '#AAE039'},
+            normalTextStyle = {fontSize: 16, color: '#AAE039', fontFamily: 'PingFangSC-Semibold'},
+            selectedTextStyle = {fontSize: 16, color: '#FFFFFF', fontFamily: 'PingFangSC-Semibold'}
+        } = this.props;
+        const { viewWidth = 0 } = this;
+        const { isScroll, currentIndex, list } = this.state;
+        if (!viewWidth && !isScroll) return null;
+
+        //背景样式
+        let mainStyles = [{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }];
+        //如果不能滚动，则定宽
+        if (!isScroll) {
+            mainStyles.push({
+                width: viewWidth/list.length
+            });
+        }
+
+        //文本样式
+        let textStyles = [styles.CommonSpace];
+
+        if (item.index == currentIndex) {
+            mainStyles.push(selectedBGStyle);
+            textStyles.push(selectedTextStyle);
+        } else {
+            mainStyles.push(normalBGStyle);
+            textStyles.push(normalTextStyle);
+        }
+
+        return (
+            <TouchableWithoutFeedback onPress={this.clickItemAtIndex.bind(this,item.index)} underlayColor={'rgba(0,0,0,0)'}>
+                <View style={mainStyles}>
+                    <Text style={textStyles}>{item.item['name'] ? item.item['name'] : ''}</Text>
+                </View>
+            </TouchableWithoutFeedback>
         );
     }
     /************************** Render中方法 **************************/
@@ -202,7 +290,7 @@ export default class CZScrollTab extends Component{
         //由于获取到视图宽度的时候，已经render了，如果isScroll是fasle的话，第一次渲染的时候不能获取到宽度，所以这里重新render一次
         if (!isScroll) {
             this.setState({
-                isScroll: false
+                isScroll: isScroll
             });
         }
     }
@@ -244,12 +332,9 @@ const styles = StyleSheet.create({
         color: '#FFFFFF'
     },
 
-    UnSelectedTextView: {
+    CommonSpace: {
         marginLeft: 10,
         marginRight: 10,
-        fontSize: 14,
-        color: '#999999',
-        fontFamily: 'PingFangSC-Regular'
     },
 
     RowCenter: {
